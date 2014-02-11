@@ -9,8 +9,8 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-
 import com.google.gson.Gson;
+
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -173,6 +173,7 @@ public class SearchForm extends Activity{
 		// Create HTTP call object
 		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
 
+		//hello
 		try {
 			// Invole web service
 			androidHttpTransport.call(SOAP_ACTION+methName, envelope);
