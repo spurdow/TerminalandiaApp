@@ -32,7 +32,7 @@ import android.widget.Toast;
 public class SearchForm extends Activity{
 	
 	private final String NAMESPACE = "http://tempuri.org/";
-	private final String URL = "http://192.168.137.1:8095/Service.asmx";
+	private final String URL = "http://192.168.1.105:8095/Service.asmx";
 	private final String SOAP_ACTION = "http://tempuri.org/";
 	private String TAG = "PGGURU";
 	private static String responseJSON;
@@ -96,14 +96,16 @@ public class SearchForm extends Activity{
 					android.R.layout.simple_dropdown_item_1line, placelist);
 			region.setAdapter(adapter);
 			//Make the progress bar invisible
-			pg.setVisibility(View.INVISIBLE);
+			if(pg != null)
+				pg.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
 		protected void onPreExecute() {
 			Log.i(TAG, "onPreExecute");
 			//Display progress bar
-			pg.setVisibility(View.VISIBLE);
+			if(pg != null)
+				pg.setVisibility(View.VISIBLE);
 		}
 
 		@Override
@@ -132,14 +134,16 @@ public class SearchForm extends Activity{
 					android.R.layout.simple_dropdown_item_1line, placelist);
 			province.setAdapter(adapter);
 			//Make the progress bar invisbile
-			pg.setVisibility(View.INVISIBLE);
+			if(pg != null)
+				pg.setVisibility(View.INVISIBLE);
 		}
 
 		@Override
 		protected void onPreExecute() {
 			Log.i(TAG, "onPreExecute");
 			//Display the progress bar
-			pg.setVisibility(View.VISIBLE);
+			if( pg != null)
+				pg.setVisibility(View.VISIBLE);
 		}
 
 		@Override
@@ -185,6 +189,8 @@ public class SearchForm extends Activity{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		Log.d(TAG, responseJSON + " response");
 	}
 
 	
