@@ -15,6 +15,8 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import com.google.gson.Gson;
 import com.terminalandiaapp.adapters.TerminalAdapter;
+import com.terminalandiaapp.commons.Alert;
+import com.terminalandiaapp.commons.ConnectionDetector;
 import com.terminalandiaapp.entities.Airplane;
 import com.terminalandiaapp.entities.Bus;
 import com.terminalandiaapp.entities.Vehicle;
@@ -90,6 +92,9 @@ public class DisplayForm extends Activity {
 		*/
 		if(extras!= null && extras.containsKey("vehicle_type")){
 			HashMap<String , String> map = new HashMap<String, String>();
+			map.put("region", extras.getString("regionId"));
+			map.put("province" , extras.getString("provinceId"));
+			map.put("type", extras.getString("type"));
 			
 		}else{
 			HashMap<String , String> map = new HashMap<String , String>();
@@ -119,6 +124,14 @@ public class DisplayForm extends Activity {
 		@Override
 		protected Void doInBackground(String... params) {
 			// TODO Auto-generated method stub
+			if(!ConnectionDetector.isConnectedToInternet(DisplayForm.this)){
+				this.cancel(true);
+			}
+			
+			if(isCancelled()){
+				return null;
+			}
+			
 			invokeJSONWS(map , params[0]);
 			return null;
 		}
@@ -126,6 +139,12 @@ public class DisplayForm extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			// TODO Auto-generated method stub
+			
+			if(isCancelled()){
+				Alert.error(DisplayForm.this, "Error!", "You dont have internet connection!.");
+				return;
+			}
+			
 			super.onPostExecute(result);
 			Response response = gson.fromJson(responseJSON , Response.class);
 			List<Result> results = response.results;

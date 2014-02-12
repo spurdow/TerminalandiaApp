@@ -11,6 +11,8 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import com.google.gson.Gson;
+import com.terminalandiaapp.commons.Alert;
+import com.terminalandiaapp.commons.ConnectionDetector;
 
 
 import android.app.Activity;
@@ -89,6 +91,14 @@ public class SearchForm extends Activity{
 		@Override
 		protected Void doInBackground(String... params) {
 			Log.i(TAG, "doInBackground");
+			if(!ConnectionDetector.isConnectedToInternet(SearchForm.this)){
+				cancel(true);
+			}
+			
+			if(isCancelled()){
+				
+				return null;
+			}
 			//Invoke web method 'PopulateCountries' with dummy value
 			invokeJSONWS("dummy","PopulateCountries");
 			return null;
@@ -97,6 +107,11 @@ public class SearchForm extends Activity{
 		@Override
 		protected void onPostExecute(Void result) {
 			Log.i(TAG, "onPostExecute");
+			if(isCancelled()){
+				Alert.error(SearchForm.this, "Error!", "You have no internet connection!.");
+				return ;
+			}
+			
 			if(responseJSON != null && !responseJSON.equals("")){
 				//Convert 'Countries' JSON response into String array using fromJSON method
 				regionList = gson.fromJson(responseJSON, com.terminalandiaapp.serializedRegions.Response.class);
@@ -119,6 +134,22 @@ public class SearchForm extends Activity{
 				
 				// enable the button for searching
 				searchButton.setEnabled(true);
+				searchButton.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View arg0) {
+						// TODO Auto-generated method stub
+						int region_position = region.getSelectedItemPosition();
+						int province_position = province.getSelectedItemPosition();
+						//int mode_position = mode.getSelectedItemPosition();
+						Intent i = new Intent(SearchForm.this , DisplayForm.class);
+						i.putExtra("regionId", regionList.results.get(region_position).regNo);
+						i.putExtra("province_id", provinceList.results.get(province_position).provId);
+						i.putExtra("type", mode.getSelectedItem().toString());
+						startActivity(i);
+					}
+					
+				});
 				
 				//Make the progress bar invisible
 				if(pg != null)
@@ -145,6 +176,14 @@ public class SearchForm extends Activity{
 		@Override
 		protected Void doInBackground(String... params) {
 			Log.i(TAG, "doInBackground");
+			if(!ConnectionDetector.isConnectedToInternet(SearchForm.this)){
+				cancel(true);
+			}
+			
+			if(isCancelled()){
+				return null;
+			}
+			
 			//Invoke web method 'PopulateCities'
 			invokeJSONWS(params[0],"PopulateCities");
 			return null;
@@ -153,6 +192,11 @@ public class SearchForm extends Activity{
 		@Override
 		protected void onPostExecute(Void result) {
 			Log.i(TAG, "onPostExecute");
+			if(isCancelled()){
+				Alert.error(SearchForm.this, "Error!","You have no internet connection!");
+				return;
+			}
+			
 			if(responseJSON != null && !responseJSON.equals("")){
 			//Convert 'Cities' JSON response into String array using fromJSON method
 				provinceList = gson.fromJson(responseJSON, com.terminalandiaapp.serializedProvinces.Response.class);	
