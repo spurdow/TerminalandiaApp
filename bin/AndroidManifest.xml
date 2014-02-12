@@ -7,7 +7,10 @@
     <uses-sdk
         android:minSdkVersion="9"
         android:targetSdkVersion="18" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
+    
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/termlogo"
@@ -24,6 +27,7 @@
         </activity>
         <activity android:name="SearchForm"></activity>
         <activity android:name="DisplayForm"></activity>
+        <activity android:name="DisplaySched"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.example.terminalandiaapp;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -29,30 +30,37 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import static com.terminalandiaapp.commons.Util.*;
+
 public class SearchForm extends Activity{
 	
-	private final String NAMESPACE = "http://tempuri.org/";
-	private final String URL = "http://192.168.1.105:8095/Service.asmx";
-	private final String SOAP_ACTION = "http://tempuri.org/";
-	private String TAG = "PGGURU";
+	private final static String TAG = "SearchForm";
 	private static String responseJSON;
+	private Button searchButton;
 	Spinner region;
 	Spinner province;
+	Spinner mode;
 	ProgressBar pg;
-	String[] placelist;
+	com.terminalandiaapp.serializedRegions.Response regionList;
+	com.terminalandiaapp.serializedProvinces.Response provinceList;
 	Gson gson = new Gson();
+	private final String[] str_mModes = {"Bus","Vessel","Airplane"};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout1);
-		//City Spinner control
+				//City Spinner control
 				province = (Spinner) findViewById(R.id.spnProv);
 				//Country Spinner control
 				region = (Spinner) findViewById(R.id.spnReg);
+				//Mode Spinner control
+				mode = (Spinner) findViewById(R.id.spnMode);
+				//Button object
+				searchButton = (Button) findViewById(R.id.btnSearch);
 				//Progress bar to be displayed until app gets web service response
-				//pg = (ProgressBar) findViewById(R.id.progressBar1);
+				pg = (ProgressBar) findViewById(R.id.progressBar1);
 				//AysnTask class to handle Country WS call as separate UI Thread
 				AsyncCountryWSCall task = new AsyncCountryWSCall();
 				//Execute the task to set Country list in Country Spinner Control
@@ -89,15 +97,33 @@ public class SearchForm extends Activity{
 		@Override
 		protected void onPostExecute(Void result) {
 			Log.i(TAG, "onPostExecute");
-			//Convert 'Countries' JSON response into String array using fromJSON method
-			placelist = gson.fromJson(responseJSON, String[].class);
-			//Assign the String array as Country Spinner Control's items
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-					android.R.layout.simple_dropdown_item_1line, placelist);
-			region.setAdapter(adapter);
-			//Make the progress bar invisible
-			if(pg != null)
-				pg.setVisibility(View.INVISIBLE);
+			if(responseJSON != null && !responseJSON.equals("")){
+				//Convert 'Countries' JSON response into String array using fromJSON method
+				regionList = gson.fromJson(responseJSON, com.terminalandiaapp.serializedRegions.Response.class);
+				List<com.terminalandiaapp.serializedRegions.Result> results = regionList.results;
+				
+				String[] list_of_regions_as_string = new String[results.size()];
+				int ctr = 0;
+				for(com.terminalandiaapp.serializedRegions.Result res : results){
+					list_of_regions_as_string[ctr++] = res.regName;
+				}
+				//Assign the String array as Country Spinner Control's items
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+						android.R.layout.simple_dropdown_item_1line, list_of_regions_as_string);
+				region.setAdapter(adapter);
+				
+				//set the mode adapter
+				ArrayAdapter<String> mModeAdapter = new ArrayAdapter<String>(getApplicationContext(),
+						android.R.layout.simple_dropdown_item_1line, str_mModes);
+				mode.setAdapter(mModeAdapter);
+				
+				// enable the button for searching
+				searchButton.setEnabled(true);
+				
+				//Make the progress bar invisible
+				if(pg != null)
+					pg.setVisibility(View.INVISIBLE);
+			}
 		}
 
 		@Override
@@ -127,13 +153,22 @@ public class SearchForm extends Activity{
 		@Override
 		protected void onPostExecute(Void result) {
 			Log.i(TAG, "onPostExecute");
+			if(responseJSON != null && !responseJSON.equals("")){
 			//Convert 'Cities' JSON response into String array using fromJSON method
-			placelist = gson.fromJson(responseJSON, String[].class);	
-			//Assign the String array as Country Spinner Control's items
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-					android.R.layout.simple_dropdown_item_1line, placelist);
-			province.setAdapter(adapter);
-			//Make the progress bar invisbile
+				provinceList = gson.fromJson(responseJSON, com.terminalandiaapp.serializedProvinces.Response.class);	
+				List<com.terminalandiaapp.serializedProvinces.Result> results = provinceList.results;
+				
+				String[] list_of_province_as_string =new String[results.size()];
+				int ctr = 0;
+				for(com.terminalandiaapp.serializedProvinces.Result res : results){
+					list_of_province_as_string[ctr++] = res.provName;
+				}
+				//Assign the String array as Country Spinner Control's items
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+						android.R.layout.simple_dropdown_item_1line, list_of_province_as_string);
+				province.setAdapter(adapter);
+				//Make the progress bar invisbile
+			}
 			if(pg != null)
 				pg.setVisibility(View.INVISIBLE);
 		}
@@ -183,6 +218,7 @@ public class SearchForm extends Activity{
 			androidHttpTransport.call(SOAP_ACTION+methName, envelope);
 			// Get the response
 			SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+						
 			// Assign it to static variable
 			responseJSON = response.toString();
 

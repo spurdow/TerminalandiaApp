@@ -31,7 +31,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		Intent i = new Intent(this,SearchForm.class);
+		Intent i = new Intent(this,DisplayForm.class);
 		startActivity(i);
 		
 	}
