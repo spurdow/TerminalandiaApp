@@ -24,15 +24,7 @@ public class ConnectionDetector {
 	            if (ni.isConnected())
 	                haveConnectedMobile = true;
 	        
-	        if(ni.isFailover()){
-	        	return false;
-	        }
-	        if(!ni.isAvailable()){
-	        	return false;
-	        }
-	        if(ni.isConnectedOrConnecting()){
-	        	return false;
-	        }
+
 	        Log.d(TAG, ni.toString() + "");
 	    }
 	    return haveConnectedWifi || haveConnectedMobile;
