@@ -36,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import static com.terminalandiaapp.commons.Util.*;
 
@@ -47,6 +48,7 @@ public class DisplayForm extends Activity {
 	private Gson gson = new Gson();
 	private ProgressBar pb;
 	private TerminalAdapter adapter;
+	private TextView search_results;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,8 @@ public class DisplayForm extends Activity {
 		setContentView(R.layout.layout2);
 		
 		list = (ListView) this.findViewById(R.id.listTerminals);
+		
+		search_results = (TextView) findViewById(R.id.txt_message);
 		
 		Bundle extras = this.getIntent().getExtras();
 		
@@ -90,11 +94,13 @@ public class DisplayForm extends Activity {
 		 * we have to search and filter it using the data passed
 		 * otherwise we just search all of them
 		*/
-		if(extras!= null && extras.containsKey("vehicle_type")){
+		if(extras!= null){
+			Log.d(TAG, "Region ID = " + extras.getString("rId"));
 			HashMap<String , String> map = new HashMap<String, String>();
-			map.put("region", extras.getString("regionId"));
-			map.put("province" , extras.getString("provinceId"));
+			map.put("region", extras.getString("rId"));
+			map.put("province" , extras.getString("pId"));
 			map.put("type", extras.getString("type"));
+			new AsyncTerminalCall(map).execute("SearchResult");
 			
 		}else{
 			HashMap<String , String> map = new HashMap<String , String>();
@@ -146,20 +152,25 @@ public class DisplayForm extends Activity {
 			}
 			
 			super.onPostExecute(result);
-			Response response = gson.fromJson(responseJSON , Response.class);
-			List<Result> results = response.results;
-			
-			for(Result r : results){
-				Vehicle vehicle = null;
-				if(r.type.equals("Vessel")){
-					vehicle = new Vessel(r.id , r.name , r.phone, r.email , r.address);
-				}else if(r.type.equals("Bus")){
-					vehicle = new Bus(r.id, r.name , r.phone , r.email , r.address);
-				}else if(r.type.equals("Airplane")){
-					vehicle = new Airplane(r.id , r.name , r.phone , r.email, r.address);
+			if(responseJSON != null && !responseJSON.equals("")){
+				Response response = gson.fromJson(responseJSON , Response.class);
+				List<Result> results = response.results;
+				
+				for(Result r : results){
+					Vehicle vehicle = null;
+					if(r.type.equals("Vessel")){
+						vehicle = new Vessel(r.id , r.name , r.phone, r.email , r.address);
+					}else if(r.type.equals("Bus")){
+						vehicle = new Bus(r.id, r.name , r.phone , r.email , r.address);
+					}else if(r.type.equals("Airplane")){
+						vehicle = new Airplane(r.id , r.name , r.phone , r.email, r.address);
+					}
+					
+					adapter.add(vehicle);
 				}
 				
-				adapter.add(vehicle);
+			}else{
+				search_results.setVisibility(View.VISIBLE);
 			}
 			pb.setVisibility(View.GONE);
 			Log.d(TAG, adapter.getAll().size() + " = size");

@@ -30,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.terminalandiaapp.commons.Util.*;
@@ -39,6 +40,7 @@ public class SearchForm extends Activity{
 	private final static String TAG = "SearchForm";
 	private static String responseJSON;
 	private Button searchButton;
+	
 	Spinner region;
 	Spinner province;
 	Spinner mode;
@@ -142,9 +144,10 @@ public class SearchForm extends Activity{
 						int region_position = region.getSelectedItemPosition();
 						int province_position = province.getSelectedItemPosition();
 						//int mode_position = mode.getSelectedItemPosition();
+						Log.d(TAG, regionList.results.get(region_position).regNo + " REGION ITEM RESULT");
 						Intent i = new Intent(SearchForm.this , DisplayForm.class);
-						i.putExtra("regionId", regionList.results.get(region_position).regNo);
-						i.putExtra("province_id", provinceList.results.get(province_position).provId);
+						i.putExtra("rId", regionList.results.get(region_position).regNo+"");
+						i.putExtra("pId", provinceList.results.get(province_position).provId+"");
 						i.putExtra("type", mode.getSelectedItem().toString());
 						startActivity(i);
 					}

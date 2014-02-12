@@ -22,4 +22,14 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
 
+    <TextView
+        android:id="@+id/txt_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Search query results found nothing!"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="gone" />
+
 </RelativeLayout>
