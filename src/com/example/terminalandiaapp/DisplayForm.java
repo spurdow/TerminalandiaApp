@@ -152,6 +152,7 @@ public class DisplayForm extends Activity {
 			}
 			
 			super.onPostExecute(result);
+
 			if(responseJSON != null && !responseJSON.equals("")){
 				Response response = gson.fromJson(responseJSON , Response.class);
 				List<Result> results = response.results;
